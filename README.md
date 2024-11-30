@@ -19,4 +19,6 @@ docker run --restart=always -itd \
     -e DEV_SERVER=$DEV_SERVER -e DEV_AUTH=$DEV_AUTH \
     -e DEV_PORT=443 \
     monius/docker-yarn-dev
+
+docker exec -it yarn_dev /bin/bash
 ```
