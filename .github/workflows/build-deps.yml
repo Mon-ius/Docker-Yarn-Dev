@@ -1,4 +1,4 @@
-name: build
+name: build-deps
 
 on:
   workflow_dispatch:
@@ -8,13 +8,11 @@ on:
     branches:
       - "master"
     paths:
-      - ".github/workflows/build.yml"
-      - "Dockerfile"
-      - "entrypoint.sh"
+      - ".github/workflows/build-deps.yml"
       - "deps/Dockerfile"
 
 jobs:
-  build:
+  build-deps:
     runs-on: ubuntu-latest
     steps:
       -
@@ -40,4 +38,4 @@ jobs:
           file: Dockerfile
           push: true
           platforms: linux/amd64, linux/arm64, linux/s390x, linux/arm, linux/ppc64le, linux/riscv64
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/docker-yarn-dev
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/docker-yarn-dev:deps
