@@ -33,10 +33,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
-        name: Build and push deps file
+        name: Build and push file
         uses: docker/build-push-action@v6
         with:
-          context: "{{defaultContext}}:deps"
+          context: "{{defaultContext}}"
           file: Dockerfile
           push: true
           platforms: linux/amd64, linux/arm64, linux/s390x, linux/arm, linux/ppc64le, linux/riscv64
