@@ -10,8 +10,8 @@
 Multi-platform: `linux/amd64`, `linux/arm64`, `linux/arm`, `linux/ppc64le`, `linux/s390x` and `linux/riscv64`;
 
 > [!TIP]
-> - To use customized `port`, set `-e DEV_PORT=$DEV_PORT`.
-> - To use Encryption with `user` and `passwd`, set `DEV_SERVER=$DEV_SERVER` and `-e DEV_AUTH=$DEV_AUTH`.
+> - To use customized `port`, set `-e DEV_PORT=$DEV_PORT`
+> - To use Encryption with `user` and `passwd`, set `DEV_SERVER=$DEV_SERVER` and `-e DEV_AUTH=$DEV_AUTH`
 
 ```sh
 docker run --restart=always -itd \
