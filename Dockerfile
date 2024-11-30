@@ -11,5 +11,7 @@ LABEL maintainer="M0nius <m0niusplus@gmail.com>" \
     org.opencontainers.image.source="https://github.com/Mon-ius/Docker-Yarn-Dev" \
     org.opencontainers.image.base.name="docker.io/monius/docker-yarn-dev"
 
+USER dev
+
 COPY entrypoint.sh /run/entrypoint.sh
 ENTRYPOINT ["/run/entrypoint.sh"]
