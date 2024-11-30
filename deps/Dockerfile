@@ -21,7 +21,7 @@ RUN apt-get -qq update \
     && rm -rf /tmp/*
 
 RUN curl -fsSL "$SAGER_NET" | gpg --dearmor -o /etc/apt/trusted.gpg.d/sagernet.gpg \
-    && echo "deb https://deb.sagernet.org * *" | tee /etc/apt/sources.list.d/sagernet.list
+    && echo "deb https://deb.sagernet.org * *" | tee /etc/apt/sources.list.d/sagernet.list \
     && apt-get -qq update \
     && apt-get -qq install sing-box \
     && apt-get -qq autoremove --purge \
@@ -31,8 +31,8 @@ RUN curl -fsSL "$SAGER_NET" | gpg --dearmor -o /etc/apt/trusted.gpg.d/sagernet.g
     && rm -rf /tmp/*
 
 RUN curl -fsSL "$NODE_23" | gpg --dearmor -o /etc/apt/trusted.gpg.d/node_23.gpg \
-    && export ARCH=$(dpkg --print-architecture)
-    && echo "deb [arch=$ARCH] https://deb.nodesource.com/node_23.x nodistro main" | tee /etc/apt/sources.list.d/node.list
+    && export ARCH=$(dpkg --print-architecture) \
+    && echo "deb [arch=$ARCH] https://deb.nodesource.com/node_23.x nodistro main" | tee /etc/apt/sources.list.d/node.list \
     && apt-get -qq update \
     && apt-get -qq install nodejs \
     && apt-get -qq autoremove --purge \

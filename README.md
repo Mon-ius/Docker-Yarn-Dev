@@ -22,3 +22,12 @@ docker run --restart=always -itd \
 
 docker exec -it yarn_dev /bin/bash
 ```
+
+> [!NOTE]
+> - To stop the environment, use `docker stop yarn_dev`
+> - To remove it, use `docker rm -f yarn_dev`
+> - To delete the image, use `docker rmi -f monius/docker-yarn-dev`
+
+```sh
+docker rm -f yarn_dev && docker rmi -f monius/docker-yarn-dev
+```
