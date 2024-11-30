@@ -15,7 +15,9 @@ ENV SAGER_NET="https://sing-box.app/gpg.key"
 ENV NODE_23="https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key"
 
 RUN curl -fsSL "$SAGER_NET" | gpg --dearmor -o /etc/apt/trusted.gpg.d/sagernet.gpg \
-    && echo "deb https://deb.sagernet.org * *" | tee /etc/apt/sources.list.d/sagernet.list \
+    && echo "deb https://deb.sagernet.org * *" | tee /etc/apt/sources.list.d/sagernet.list
+
+RUN cat /etc/apt/sources.list.d/sagernet.list \
     && apt-get -qq update \
     && apt-get -qq install sing-box \
     && apt-get -qq autoremove --purge \
