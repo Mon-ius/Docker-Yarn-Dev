@@ -365,8 +365,43 @@ $AUTH_PART
 }
 EOF
 
+ip rule add fwmark 0x1 lookup 100
+ip route add local default dev lo table 100
+
+iptables -t mangle -N DEV
+iptables -t mangle -A DEV -m mark --mark 0xff -j RETURN
+iptables -t mangle -A DEV -d 0.0.0.0/8 -j RETURN
+iptables -t mangle -A DEV -d 10.0.0.0/8 -j RETURN
+iptables -t mangle -A DEV -d 127.0.0.0/8 -j RETURN
+iptables -t mangle -A DEV -d 169.254.0.0/16 -j RETURN
+iptables -t mangle -A DEV -d 172.16.0.0/12 -j RETURN
+iptables -t mangle -A DEV -d 192.168.0.0/16 -j RETURN
+iptables -t mangle -A DEV -d 224.0.0.0/4 -j RETURN
+iptables -t mangle -A DEV -d 240.0.0.0/4 -j RETURN
+iptables -t mangle -A DEV -p tcp -j TPROXY --on-port 60091 --on-ip 127.0.0.1 --tproxy-mark 0x1
+iptables -t mangle -A DEV -p udp -j TPROXY --on-port 60091 --on-ip 127.0.0.1 --tproxy-mark 0x1 
+iptables -t mangle -A PREROUTING -j DEV
+
+iptables -t mangle -N DEV_MASK
+iptables -t mangle -A DEV_MASK -m mark --mark 0xff -j RETURN
+iptables -t mangle -A DEV_MASK -d 0.0.0.0/8 -j RETURN
+iptables -t mangle -A DEV_MASK -d 10.0.0.0/8 -j RETURN
+iptables -t mangle -A DEV_MASK -d 127.0.0.0/8 -j RETURN
+iptables -t mangle -A DEV_MASK -d 169.254.0.0/16 -j RETURN
+iptables -t mangle -A DEV_MASK -d 172.16.0.0/12 -j RETURN
+iptables -t mangle -A DEV_MASK -d 192.168.0.0/16 -j RETURN
+iptables -t mangle -A DEV_MASK -d 224.0.0.0/4 -j RETURN
+iptables -t mangle -A DEV_MASK -d 240.0.0.0/4 -j RETURN
+iptables -t mangle -A DEV_MASK -p tcp -j MARK --set-mark 0x1
+iptables -t mangle -A DEV_MASK -p udp -j MARK --set-mark 0x1
+iptables -t mangle -A OUTPUT -j DEV_MASK
+
 if [ ! -e "/usr/bin/dev-cli" ]; then
     echo "sing-box -c /etc/sing-box/config.json run" > /usr/bin/dev-cli && chmod +x /usr/bin/dev-cli
+fi
+
+if [ -e "/usr/bin/corepack" ]; then
+    corepack enable && corepack prepare yarn@stable --activate
 fi
 
 exec "$@"

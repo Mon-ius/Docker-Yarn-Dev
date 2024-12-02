@@ -23,19 +23,13 @@ sudo usermod -aG docker $USER
 > - To use Encryption with `user` and `passwd`, set `DEV_SERVER=$DEV_SERVER` and `-e DEV_AUTH=$DEV_AUTH`
 
 ```sh
-docker run --privileged --restart=always -itd \
+docker run --restart=always -itd \
     --name yarn_dev \
     -e DEV_SERVER=$DEV_SERVER -e DEV_AUTH=$DEV_AUTH \
     -e DEV_PORT=443 \
-    --sysctl net.ipv6.conf.all.disable_ipv6=0 \
-    --sysctl net.ipv4.conf.all.src_valid_mark=1 \
     --cap-add NET_ADMIN \
-    --cap-add NET_RAW \
-    --cap-add SYS_MODULE \
-    --device=/dev/net/tun \
-    monius/docker-yarn-dev:deps
+    monius/docker-yarn-dev
 
-docker logs yarn_dev
 docker exec -it yarn_dev /bin/bash
 ```
 
@@ -46,6 +40,42 @@ docker exec -it yarn_dev /bin/bash
 
 ```sh
 docker rm -f yarn_dev && docker rmi -f monius/docker-yarn-dev
+```
+
+> [!WARNING]  
+> - To proxy all packages from both LAN net and container itself.
+
+```sh
+ip rule add fwmark 0x1 lookup 100
+ip route add local default dev lo table 100
+
+iptables -t mangle -N DEV
+iptables -t mangle -A DEV -m mark --mark 0xff -j RETURN
+iptables -t mangle -A DEV -d 0.0.0.0/8 -j RETURN
+iptables -t mangle -A DEV -d 10.0.0.0/8 -j RETURN
+iptables -t mangle -A DEV -d 127.0.0.0/8 -j RETURN
+iptables -t mangle -A DEV -d 169.254.0.0/16 -j RETURN
+iptables -t mangle -A DEV -d 172.16.0.0/12 -j RETURN
+iptables -t mangle -A DEV -d 192.168.0.0/16 -j RETURN
+iptables -t mangle -A DEV -d 224.0.0.0/4 -j RETURN
+iptables -t mangle -A DEV -d 240.0.0.0/4 -j RETURN
+iptables -t mangle -A DEV -p tcp -j TPROXY --on-port 60091 --on-ip 127.0.0.1 --tproxy-mark 0x1
+iptables -t mangle -A DEV -p udp -j TPROXY --on-port 60091 --on-ip 127.0.0.1 --tproxy-mark 0x1 
+iptables -t mangle -A PREROUTING -j DEV
+
+iptables -t mangle -N DEV_MASK
+iptables -t mangle -A DEV_MASK -m mark --mark 0xff -j RETURN
+iptables -t mangle -A DEV_MASK -d 0.0.0.0/8 -j RETURN
+iptables -t mangle -A DEV_MASK -d 10.0.0.0/8 -j RETURN
+iptables -t mangle -A DEV_MASK -d 127.0.0.0/8 -j RETURN
+iptables -t mangle -A DEV_MASK -d 169.254.0.0/16 -j RETURN
+iptables -t mangle -A DEV_MASK -d 172.16.0.0/12 -j RETURN
+iptables -t mangle -A DEV_MASK -d 192.168.0.0/16 -j RETURN
+iptables -t mangle -A DEV_MASK -d 224.0.0.0/4 -j RETURN
+iptables -t mangle -A DEV_MASK -d 240.0.0.0/4 -j RETURN
+iptables -t mangle -A DEV_MASK -p tcp -j MARK --set-mark 0x1
+iptables -t mangle -A DEV_MASK -p udp -j MARK --set-mark 0x1
+iptables -t mangle -A OUTPUT -j DEV_MASK
 ```
 
 > [!CAUTION]
