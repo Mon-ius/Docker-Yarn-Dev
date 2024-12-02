@@ -2,6 +2,8 @@
 
 set -e
 
+corepack enable && corepack prepare yarn@stable --activate
+
 sleep 5
 
 _DEV_SERVER=example.com
