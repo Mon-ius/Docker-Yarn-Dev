@@ -37,3 +37,5 @@ RUN curl -fsSL "$NODE_23" | gpg --dearmor -o /etc/apt/trusted.gpg.d/node_23.gpg 
 
 COPY entrypoint.sh /run/entrypoint.sh
 ENTRYPOINT ["/run/entrypoint.sh"]
+
+CMD ["dev-cli"]

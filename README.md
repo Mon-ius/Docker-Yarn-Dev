@@ -9,24 +9,27 @@
 
 Multi-platform: `linux/amd64`, `linux/arm64`, `linux/arm`, `linux/s390x` and `linux/riscv64`;
 
+> [!IMPORTANT]  
+> For permission related issue to use `docker` instead of `sudo docker`
+
+```sh
+sudo chmod 666 /var/run/docker.sock
+sudo groupadd docker
+sudo usermod -aG docker $USER
+```
+
 > [!TIP]
 > - To use customized `port`, set `-e DEV_PORT=$DEV_PORT`
 > - To use Encryption with `user` and `passwd`, set `DEV_SERVER=$DEV_SERVER` and `-e DEV_AUTH=$DEV_AUTH`
 
 ```sh
-sudo docker run --restart=always -itd \
+docker run --restart=always -itd \
     --name yarn_dev \
     -e DEV_SERVER=$DEV_SERVER -e DEV_AUTH=$DEV_AUTH \
     -e DEV_PORT=443 \
     monius/docker-yarn-dev
 
-sudo docker run --restart=always -itd \
-    --name yarn_dev \
-    -e DEV_SERVER=$DEV_SERVER -e DEV_AUTH=$DEV_AUTH \
-    -e DEV_PORT=443 \
-    monius/docker-yarn-dev:deps
-
-sudo docker exec -it yarn_dev /bin/bash
+docker exec -it yarn_dev /bin/bash
 ```
 
 > [!NOTE]
