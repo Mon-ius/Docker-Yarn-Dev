@@ -11,20 +11,6 @@ LABEL maintainer="M0nius <m0niusplus@gmail.com>" \
     org.opencontainers.image.source="https://github.com/Mon-ius/Docker-Yarn-Dev" \
     org.opencontainers.image.base.name="docker.io/monius/docker-yarn-dev"
 
-
-ENV NODE_23="https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key"
-
-RUN curl -fsSL "$NODE_23" | gpg --dearmor -o /etc/apt/trusted.gpg.d/node_23.gpg \
-    && export ARCH=$(dpkg --print-architecture) \
-    && echo "deb [arch=$ARCH] https://deb.nodesource.com/node_23.x nodistro main" | tee /etc/apt/sources.list.d/node.list \
-    && apt-get -qq update \
-    && apt-get -qq install nodejs \
-    && apt-get -qq autoremove --purge \
-    && apt-get -qq autoclean \
-    && rm -rf /etc/apt/sources.list.d/node.list \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /tmp/*
-
 COPY entrypoint.sh /run/entrypoint.sh
 ENTRYPOINT ["/run/entrypoint.sh"]
 
