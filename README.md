@@ -33,6 +33,19 @@ docker run --restart=always -itd \
 docker exec -it yarn_dev /bin/bash
 ```
 
+---
+
+```sh
+docker run --restart=always -itd \
+    --name yarn_dev \
+    -e DEV_SERVER=$DEV_SERVER -e DEV_AUTH=$DEV_AUTH \
+    -e DEV_PORT=443 \
+    --cap-add NET_ADMIN \
+    ghcr.io/mon-ius/docker-yarn-dev
+
+docker exec -it yarn_dev /bin/bash
+```
+
 > [!NOTE]
 > - To stop the environment, use `docker stop yarn_dev`
 > - To force remove it, use `docker rm -f yarn_dev`
