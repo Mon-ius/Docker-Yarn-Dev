@@ -7,7 +7,7 @@
 
 > Modern develop environment, with Yarn.
 
-Multi-platform: `linux/amd64`, `linux/arm64`, `linux/arm`, `linux/ppc64le`, `linux/s390x` and `linux/riscv64`;
+Multi-platform: `linux/amd64`, `linux/arm64`, `linux/arm`, `linux/s390x` and `linux/riscv64`;
 
 > [!TIP]
 > - To use customized `port`, set `-e DEV_PORT=$DEV_PORT`
