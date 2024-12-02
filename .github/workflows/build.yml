@@ -2,8 +2,10 @@ name: build
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 6 */6 * *'
+  workflow_run:
+    workflows: ["build-deps"]
+    types:
+      - completed
   push:
     branches:
       - "master"
