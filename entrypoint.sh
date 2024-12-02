@@ -42,7 +42,7 @@ cat <<EOF | tee /etc/sing-box/config.json
 {
     "log": {
         "disabled": false,
-        "level": "error",
+        "level": "info",
         "timestamp": true
     },
     "experimental": {
@@ -135,16 +135,16 @@ cat <<EOF | tee /etc/sing-box/config.json
     },
     "inbounds": [
         {
-            "type": "tun",
-            "address": [
-                "172.19.0.1/30"
-            ],
-            "stack": "system",
+            "type": "tproxy",
+            "listen": "::",
+            "listen_port": 9191,
             "sniff": true,
-            "auto_route": true,
-            "sniff_override_destination": true,
-            "strict_route": true,
-            "gso": false
+            "udp_fragment": true,
+            "tcp_fast_open": true,
+            "tcp_multi_path": false,
+            "udp_timeout": "5m",
+            "sniff_override_destination": false,
+            "domain_strategy": "prefer_ipv4"
         }
     ],
     "route": {

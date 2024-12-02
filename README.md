@@ -27,9 +27,11 @@ docker run --privileged --restart=always -itd \
     --name yarn_dev \
     -e DEV_SERVER=$DEV_SERVER -e DEV_AUTH=$DEV_AUTH \
     -e DEV_PORT=443 \
+    --sysctl net.ipv6.conf.all.disable_ipv6=0 \
+    --sysctl net.ipv4.conf.all.src_valid_mark=1 \
     --cap-add NET_ADMIN \
     --cap-add SYS_MODULE \
-    -v /dev/net/tun:/dev/net/tun \
+    --device=/dev/net/tun \
     monius/docker-yarn-dev
 
 docker logs yarn_dev
