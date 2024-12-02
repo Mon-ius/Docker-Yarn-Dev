@@ -60,4 +60,4 @@ jobs:
           platforms: linux/amd64, linux/arm64, linux/s390x, linux/riscv64, linux/arm
           tags: |
             ${{ env.dockerhub_tag }}/docker-yarn-dev
-            ${{ env.ghcr_tag }}/docker-yarn-dev
+            ghcr.io/${{ secrets.DOCKERHUB_USERNAME }}/docker-yarn-dev
