@@ -38,7 +38,7 @@ sudo docker exec -it yarn_dev /bin/bash
 docker rm -f yarn_dev && docker rmi -f monius/docker-yarn-dev
 ```
 
-> [!WARN]
+> [!CAUTION]
 > - To prune all docker containers and images
 
 ```sh
