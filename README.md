@@ -14,13 +14,19 @@ Multi-platform: `linux/amd64`, `linux/arm64`, `linux/arm`, `linux/ppc64le`, `lin
 > - To use Encryption with `user` and `passwd`, set `DEV_SERVER=$DEV_SERVER` and `-e DEV_AUTH=$DEV_AUTH`
 
 ```sh
-docker run --restart=always -itd \
+sudo docker run --restart=always -itd \
     --name yarn_dev \
     -e DEV_SERVER=$DEV_SERVER -e DEV_AUTH=$DEV_AUTH \
     -e DEV_PORT=443 \
     monius/docker-yarn-dev
 
-docker exec -it yarn_dev /bin/bash
+sudo docker run --restart=always -itd \
+    --name yarn_dev \
+    -e DEV_SERVER=$DEV_SERVER -e DEV_AUTH=$DEV_AUTH \
+    -e DEV_PORT=443 \
+    monius/docker-yarn-dev:deps
+
+sudo docker exec -it yarn_dev /bin/bash
 ```
 
 > [!NOTE]
