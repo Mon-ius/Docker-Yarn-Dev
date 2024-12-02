@@ -29,7 +29,7 @@ docker run --privileged --restart=always -itd \
     -e DEV_PORT=443 \
     --cap-add NET_ADMIN \
     --cap-add SYS_MODULE \
-    --device=/dev/net/tun \
+    -v /dev/net/tun:/dev/net/tun \
     monius/docker-yarn-dev
 
 docker logs yarn_dev

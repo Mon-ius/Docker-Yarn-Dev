@@ -137,10 +137,9 @@ cat <<EOF | tee /etc/sing-box/config.json
         {
             "type": "tun",
             "address": [
-                "172.19.0.1/30",
-                "fdfe:dcba:9876::1/126"
+                "172.19.0.1/30"
             ],
-            "stack": "gvisor",
+            "stack": "system",
             "sniff": true,
             "auto_route": true,
             "sniff_override_destination": true,
