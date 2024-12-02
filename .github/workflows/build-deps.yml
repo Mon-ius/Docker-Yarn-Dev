@@ -37,5 +37,5 @@ jobs:
           context: "{{defaultContext}}:deps"
           file: Dockerfile
           push: true
-          platforms: linux/amd64, linux/arm64, linux/s390x, linux/arm, linux/riscv64
+          platforms: linux/amd64, linux/arm64, linux/s390x, linux/riscv64, linux/arm
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/docker-yarn-dev:deps
