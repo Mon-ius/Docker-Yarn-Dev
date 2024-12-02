@@ -37,3 +37,10 @@ sudo docker exec -it yarn_dev /bin/bash
 ```sh
 docker rm -f yarn_dev && docker rmi -f monius/docker-yarn-dev
 ```
+
+> [!WARN]
+> - To prune all docker containers and images
+
+```sh
+docker rm -f $(docker ps -a -q) && docker rmi -f $(docker images -a -q)
+```
