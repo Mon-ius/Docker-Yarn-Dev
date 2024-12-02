@@ -30,9 +30,10 @@ docker run --privileged --restart=always -itd \
     --sysctl net.ipv6.conf.all.disable_ipv6=0 \
     --sysctl net.ipv4.conf.all.src_valid_mark=1 \
     --cap-add NET_ADMIN \
+    --cap-add NET_RAW \
     --cap-add SYS_MODULE \
     --device=/dev/net/tun \
-    monius/docker-yarn-dev
+    monius/docker-yarn-dev:deps
 
 docker logs yarn_dev
 docker exec -it yarn_dev /bin/bash

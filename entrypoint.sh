@@ -137,7 +137,7 @@ cat <<EOF | tee /etc/sing-box/config.json
         {
             "type": "tproxy",
             "listen": "::",
-            "listen_port": 9191,
+            "listen_port": 60091,
             "sniff": true,
             "udp_fragment": true,
             "tcp_fast_open": true,

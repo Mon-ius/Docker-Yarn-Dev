@@ -3,7 +3,7 @@ FROM debian:trixie-slim
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ="Europe/London"
-ENV PKG="sudo net-tools curl git git-lfs bzip2 gnupg2 dnsutils iptables kmod"
+ENV PKG="sudo net-tools curl git git-lfs bzip2 gnupg2 iproute2 iptables openresolv kmod"
 ENV SAGER_NET="https://sing-box.app/gpg.key"
 
 RUN apt-get -qq update \
