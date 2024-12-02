@@ -24,6 +24,10 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+    - id: lower-username
+      run: |
+        echo "username=${GITHUB_REPOSITORY@L}" >> $GITHUB_OUTPUT
+
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -46,4 +50,4 @@ jobs:
           platforms: linux/amd64, linux/arm64, linux/s390x, linux/riscv64, linux/arm
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/docker-yarn-dev:deps
-            ghcr.io/${{ github.repository_owner }}/docker-yarn-dev:deps
+            ghcr.io/${{ github.repository_owner }}.toLowerCase()/docker-yarn-dev:deps
