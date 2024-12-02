@@ -3,7 +3,7 @@ FROM debian:trixie-slim
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ="Europe/London"
-ENV PKG="sudo net-tools curl git git-lfs bzip2 gnupg2 dnsutils"
+ENV PKG="sudo net-tools curl git git-lfs bzip2 gnupg2 dnsutils nftables kmod"
 
 RUN apt-get -qq update \
     && apt-get -qq dist-upgrade -y \
