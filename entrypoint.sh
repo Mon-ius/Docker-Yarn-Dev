@@ -400,8 +400,4 @@ if [ ! -e "/usr/bin/dev-cli" ]; then
     echo "sing-box -c /etc/sing-box/config.json run" > /usr/bin/dev-cli && chmod +x /usr/bin/dev-cli
 fi
 
-if [ -e "/usr/bin/corepack" ]; then
-    corepack enable && corepack prepare yarn@stable --activate
-fi
-
 exec "$@"
