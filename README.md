@@ -51,7 +51,7 @@ docker exec -it yarn_dev /bin/bash
 ```sh
 docker run --restart=always -itd \
     --name yarn_dev_ssh \
-    -v ~/.ssh/id_ed25519:~/.ssh/id_ed25519 \
+    -v ~/.ssh/id_ed25519:/root/.ssh/id_ed25519 \
     -e D_SERVER=$D_SERVER -e D_PORT=62222 \
     -e D_USER=$D_USER -e D_PUB_KEY=$D_PUB_KEY \
     ghcr.io/mon-ius/docker-yarn-dev:ssh
