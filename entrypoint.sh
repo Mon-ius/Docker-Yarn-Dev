@@ -6,29 +6,29 @@ corepack enable && corepack prepare yarn@stable --activate
 
 sleep 5
 
-_DEV_SERVER=example.com
-_DEV_PORT=443
-_DEV_AUTH=passwd
+_X_SERVER=example.com
+_X_PORT=443
+_X_AUTH=passwd
 
-DEV_SERVER="${DEV_SERVER:-$_DEV_SERVER}"
-DEV_PORT="${DEV_PORT:-$_DEV_PORT}"
-DEV_AUTH="${DEV_AUTH:-$_DEV_AUTH}"
+X_SERVER="${X_SERVER:-$_X_SERVER}"
+X_PORT="${X_PORT:-$_X_PORT}"
+X_AUTH="${X_AUTH:-$_X_AUTH}"
 
-if [ -n "$DEV_SERVER" ] && [ -n "$DEV_PORT" ] && [ -n "$DEV_AUTH" ]; then
+if [ -n "$X_SERVER" ] && [ -n "$X_PORT" ] && [ -n "$X_AUTH" ]; then
     AUTH_PART=$(cat <<EOF
         {
             "tag": "Proxy",
             "type": "hysteria2",
-            "server": "$DEV_SERVER",
-            "server_port": $DEV_PORT,
+            "server": "$X_SERVER",
+            "server_port": $X_PORT,
             "up_mbps": 1000,
             "down_mbps": 1000,
-            "password": "$DEV_AUTH",
+            "password": "$X_AUTH",
             "connect_timeout": "5s",
             "tcp_fast_open": true,
             "tls": {
                 "enabled": true,
-                "server_name": "$DEV_SERVER",
+                "server_name": "$X_SERVER",
                 "alpn": [
                     "h3"
                 ]

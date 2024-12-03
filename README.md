@@ -19,14 +19,14 @@ sudo usermod -aG docker $USER
 ```
 
 > [!TIP]
-> - To use customized `port`, set `-e DEV_PORT=$DEV_PORT`
-> - To use Encryption with `user` and `passwd`, set `DEV_SERVER=$DEV_SERVER` and `-e DEV_AUTH=$DEV_AUTH`
+> - To use customized `port`, set `-e X_PORT=$X_PORT`
+> - To use Encryption with `user` and `passwd`, set `X_SERVER=$X_SERVER` and `-e X_AUTH=$X_AUTH`
 
 ```sh
 docker run --restart=always -itd \
     --name yarn_dev \
-    -e DEV_SERVER=$DEV_SERVER -e DEV_AUTH=$DEV_AUTH \
-    -e DEV_PORT=443 \
+    -e X_SERVER=$X_SERVER -e X_AUTH=$X_AUTH \
+    -e X_PORT=443 \
     --cap-add NET_ADMIN \
     monius/docker-yarn-dev
 
@@ -38,8 +38,8 @@ docker exec -it yarn_dev /bin/bash
 ```sh
 docker run --restart=always -itd \
     --name yarn_dev \
-    -e DEV_SERVER=$DEV_SERVER -e DEV_AUTH=$DEV_AUTH \
-    -e DEV_PORT=443 \
+    -e X_SERVER=$X_SERVER -e X_AUTH=$X_AUTH \
+    -e X_PORT=443 \
     --cap-add NET_ADMIN \
     ghcr.io/mon-ius/docker-yarn-dev
 
