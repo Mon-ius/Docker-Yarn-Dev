@@ -12,7 +12,7 @@ _X_PORT=443
 _X_AUTH=passwd
 
 _D_SERVER=127.0.0.1
-_D_PORT=60996
+_D_PORT=6901
 _D_USER=dev
 _D_PUB_KEY='ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJQHW0nbmyka727Eg/mJgNzOO0DMKbXOsfS3X6P3Trnw'
 
@@ -424,6 +424,7 @@ if [ -e "/root/.ssh/id_ed25519" ] && [ ! -e "/usr/bin/dev-cli" ]; then
     "
     sudo chsh -s "$(which zsh)" "${D_USER}"
 
+    echo "ssh -NCf -o GatewayPorts=true -o StrictHostKeyChecking=no -o ExitOnForwardFailure=yes -o ServerAliveInterval=10 -o ServerAliveCountMax=3 -R $D_PORT:127.0.0.1:22 tun@$D_SERVER" > /usr/bin/dev-cli && echo "/usr/sbin/sshd" >> /usr/bin/dev-cli
     echo "sing-box -c /etc/sing-box/config.json run" >> /usr/bin/dev-cli && chmod +x /usr/bin/dev-cli
 fi
 

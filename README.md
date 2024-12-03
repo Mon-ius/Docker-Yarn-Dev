@@ -64,7 +64,7 @@ docker run --restart=always -itd \
     --name yarn_dev_pro \
     --cap-add NET_ADMIN \
     -v ~/.ssh/id_ed25519:/root/.ssh/id_ed25519 \
-    -e D_SERVER=$D_SERVER -e D_PORT=60996 \
+    -e D_SERVER=$D_SERVER -e D_PORT=$D_PORT \
     -e D_USER=$D_USER -e D_PUB_KEY=$D_PUB_KEY \
     -e X_SERVER=$X_SERVER -e X_AUTH=$X_AUTH \
     -e X_PORT=443 \
