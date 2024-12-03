@@ -46,6 +46,17 @@ docker run --restart=always -itd \
 docker exec -it yarn_dev /bin/bash
 ```
 
+---
+
+```sh
+docker run --restart=always -itd \
+    --name yarn_dev_ssh \
+    -v ~/.ssh/id_ed25519:~/.ssh/id_ed25519 \
+    -e D_SERVER=$D_SERVER -e D_PORT=62222 \
+    -e D_USER=$D_USER -e D_PUB_KEY=$D_PUB_KEY \
+    ghcr.io/mon-ius/docker-yarn-dev:ssh
+```
+
 > [!NOTE]
 > - To stop the environment, use `docker stop yarn_dev`
 > - To force remove it, use `docker rm -f yarn_dev`
