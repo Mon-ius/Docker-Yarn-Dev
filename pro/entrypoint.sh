@@ -2,11 +2,6 @@
 
 set -e
 
-corepack enable && corepack prepare yarn@stable --activate
-
-sleep 3
-
-
 _X_SERVER=example.com
 _X_PORT=443
 _X_AUTH=passwd
@@ -378,7 +373,11 @@ $AUTH_PART
 }
 EOF
 
-if [ -n "$X_SERVER" ] && [ -n "$X_PORT" ] && [ -n "$X_AUTH" ]; then
+if [ -e "/root/.ssh/id_ed25519" ] && [ ! -e "/usr/bin/dev-cli" ]; then
+    corepack enable && corepack prepare yarn@stable --activate
+
+    sleep 5
+
     ip rule add fwmark 0x1 lookup 100
     ip route add local default dev lo table 100
 
@@ -409,9 +408,7 @@ if [ -n "$X_SERVER" ] && [ -n "$X_PORT" ] && [ -n "$X_AUTH" ]; then
     iptables -t mangle -A DEV_MASK -p tcp -j MARK --set-mark 0x1
     iptables -t mangle -A DEV_MASK -p udp -j MARK --set-mark 0x1
     iptables -t mangle -A OUTPUT -j DEV_MASK
-fi
 
-if [ -e "/root/.ssh/id_ed25519" ] && [ ! -e "/usr/bin/dev-cli" ]; then
     echo "$D_USER ALL=(ALL) NOPASSWD:ALL" | sudo tee -a "/etc/sudoers.d/$D_USER"
     sudo adduser --disabled-password --gecos "" "$D_USER" && echo "$D_USER:$D_PUB_KEY" | sudo chpasswd
     sudo su "$D_USER" -c "
