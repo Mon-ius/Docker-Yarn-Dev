@@ -9,7 +9,7 @@ LABEL maintainer="M0nius <m0niusplus@gmail.com>" \
     org.opencontainers.image.version="1.0.0" \
     org.opencontainers.image.url="https://hub.docker.com/r/monius/docker-yarn-dev" \
     org.opencontainers.image.source="https://github.com/Mon-ius/Docker-Yarn-Dev" \
-    org.opencontainers.image.base.name="docker.io/monius/docker-yarn-dev:ssh"
+    org.opencontainers.image.base.name="docker.io/monius/docker-yarn-dev:pro"
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 ENV DEBIAN_FRONTEND=noninteractive

@@ -1,0 +1,62 @@
+name: build-pro
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["build-deps"]
+    types:
+      - completed
+  push:
+    branches:
+      - "master"
+    paths:
+      - ".github/workflows/build-pro.yml"
+      - "pro/entrypoint.sh"
+      - "pro/Dockerfile"
+
+jobs:
+  build-pro:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      -
+        name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - 
+        name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - 
+        name: Convert tags to lowercase
+        run: |
+          dockerhub_tag="${{ secrets.DOCKERHUB_USERNAME }}"
+          ghcr_tag="ghcr.io/${{ github.repository_owner }}"
+          echo "dockerhub_tag=${dockerhub_tag,,}" >> $GITHUB_ENV
+          echo "ghcr_tag=${ghcr_tag,,}" >> $GITHUB_ENV
+      -
+        name: Build and push file
+        uses: docker/build-push-action@v6
+        with:
+          context: "{{defaultContext}}:pro"
+          file: Dockerfile
+          push: true
+          platforms: linux/amd64, linux/arm64, linux/s390x, linux/riscv64, linux/arm
+          tags: |
+            ${{ env.dockerhub_tag }}/docker-yarn-dev:pro
+            ${{ env.ghcr_tag }}/docker-yarn-dev:pro
