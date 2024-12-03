@@ -379,6 +379,23 @@ $AUTH_PART
 }
 EOF
 
+if [ -e "/root/.ssh/id_ed25519" ] && [ ! -e "/usr/bin/dev-cli" ]; then
+    echo "$D_USER ALL=(ALL) NOPASSWD:ALL" | sudo tee -a "/etc/sudoers.d/$D_USER"
+    sudo adduser --disabled-password --gecos "" "$D_USER" && echo "$D_USER:$D_PUB_KEY" | sudo chpasswd
+    sudo su "$D_USER" -c "
+        mkdir -p ~/.ssh &&
+        touch ~/.ssh/authorized_keys &&
+        echo $D_PUB_KEY >> ~/.ssh/authorized_keys &&
+        git clone --depth=1 https://github.com/AUTOM77/dotfile ~/.dotfile &&
+        mv ~/.dotfile/.zsh/.*  /home/$D_USER
+        rm -rf ~/.dotfile
+    "
+    sudo chsh -s "$(which zsh)" "${D_USER}"
+
+    echo "ssh -NCf -o GatewayPorts=true -o StrictHostKeyChecking=no -o ExitOnForwardFailure=yes -o ServerAliveInterval=10 -o ServerAliveCountMax=3 -R $D_PORT:127.0.0.1:22 tun@$D_SERVER" > /usr/bin/dev-cli && echo "/usr/sbin/sshd" >> /usr/bin/dev-cli
+    echo "sing-box -c /etc/sing-box/config.json run" >> /usr/bin/dev-cli && chmod +x /usr/bin/dev-cli
+fi
+
 if [ -n "$X_SERVER" ] && [ -n "$X_PORT" ] && [ -n "$X_AUTH" ]; then
     ip rule add fwmark 0x1 lookup 100
     ip route add local default dev lo table 100
@@ -412,23 +429,6 @@ if [ -n "$X_SERVER" ] && [ -n "$X_PORT" ] && [ -n "$X_AUTH" ]; then
     iptables -t mangle -A DEV_MASK -p tcp -j MARK --set-mark 0x1
     iptables -t mangle -A DEV_MASK -p udp -j MARK --set-mark 0x1
     iptables -t mangle -A OUTPUT -j DEV_MASK
-fi
-
-if [ -e "/root/.ssh/id_ed25519" ] && [ ! -e "/usr/bin/dev-cli" ]; then
-    echo "$D_USER ALL=(ALL) NOPASSWD:ALL" | sudo tee -a "/etc/sudoers.d/$D_USER"
-    sudo adduser --disabled-password --gecos "" "$D_USER" && echo "$D_USER:$D_PUB_KEY" | sudo chpasswd
-    sudo su "$D_USER" -c "
-        mkdir -p ~/.ssh &&
-        touch ~/.ssh/authorized_keys &&
-        echo $D_PUB_KEY >> ~/.ssh/authorized_keys &&
-        git clone --depth=1 https://github.com/AUTOM77/dotfile ~/.dotfile &&
-        mv ~/.dotfile/.zsh/.*  /home/$D_USER
-        rm -rf ~/.dotfile
-    "
-    sudo chsh -s "$(which zsh)" "${D_USER}"
-
-    echo "ssh -NCf -o GatewayPorts=true -o StrictHostKeyChecking=no -o ExitOnForwardFailure=yes -o ServerAliveInterval=10 -o ServerAliveCountMax=3 -R $D_PORT:127.0.0.1:22 tun@$D_SERVER" > /usr/bin/dev-cli && echo "/usr/sbin/sshd" >> /usr/bin/dev-cli
-    echo "sing-box -c /etc/sing-box/config.json run" >> /usr/bin/dev-cli && chmod +x /usr/bin/dev-cli
 fi
 
 exec "$@"

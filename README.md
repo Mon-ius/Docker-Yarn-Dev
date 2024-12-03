@@ -25,9 +25,9 @@ sudo usermod -aG docker $USER
 ```sh
 docker run --restart=always -itd \
     --name yarn_dev \
+    --cap-add NET_ADMIN \
     -e X_SERVER=$X_SERVER -e X_AUTH=$X_AUTH \
     -e X_PORT=443 \
-    --cap-add NET_ADMIN \
     monius/docker-yarn-dev
 
 docker exec -it yarn_dev /bin/bash
@@ -38,9 +38,9 @@ docker exec -it yarn_dev /bin/bash
 ```sh
 docker run --restart=always -itd \
     --name yarn_dev \
+    --cap-add NET_ADMIN \
     -e X_SERVER=$X_SERVER -e X_AUTH=$X_AUTH \
     -e X_PORT=443 \
-    --cap-add NET_ADMIN \
     ghcr.io/mon-ius/docker-yarn-dev
 
 docker exec -it yarn_dev /bin/bash
@@ -55,6 +55,20 @@ docker run --restart=always -itd \
     -e D_SERVER=$D_SERVER -e D_PORT=62222 \
     -e D_USER=$D_USER -e D_PUB_KEY=$D_PUB_KEY \
     ghcr.io/mon-ius/docker-yarn-dev:ssh
+```
+
+---
+
+```sh
+docker run --restart=always -itd \
+    --name yarn_dev_pro \
+    --cap-add NET_ADMIN \
+    -v ~/.ssh/id_ed25519:/root/.ssh/id_ed25519 \
+    -e D_SERVER=$D_SERVER -e D_PORT=60996 \
+    -e D_USER=$D_USER -e D_PUB_KEY=$D_PUB_KEY \
+    -e X_SERVER=$X_SERVER -e X_AUTH=$X_AUTH \
+    -e X_PORT=443 \
+    ghcr.io/mon-ius/docker-yarn-dev:pro
 ```
 
 > [!NOTE]
