@@ -2,6 +2,10 @@
 
 set -e
 
+corepack enable && corepack prepare yarn@stable --activate
+
+sleep 3
+
 _X_SERVER=example.com
 _X_PORT=443
 _X_AUTH=passwd
@@ -21,32 +25,32 @@ D_USER="${D_USER:-$_D_USER}"
 D_PUB_KEY="${D_PUB_KEY:-$_D_PUB_KEY}"
 
 if [ -n "$X_SERVER" ] && [ -n "$X_PORT" ] && [ -n "$X_AUTH" ]; then
-    AUTH_PART=$(cat <<EOF
-        {
-            "tag": "Proxy",
-            "type": "hysteria2",
-            "server": "$X_SERVER",
-            "server_port": $X_PORT,
-            "up_mbps": 1000,
-            "down_mbps": 1000,
-            "password": "$X_AUTH",
-            "connect_timeout": "5s",
-            "tcp_fast_open": true,
-            "tls": {
-                "enabled": true,
-                "server_name": "$X_SERVER",
-                "alpn": [
-                    "h3"
-                ]
-            }
+AUTH_PART=$(cat <<EOF
+    {
+        "tag": "Proxy",
+        "type": "hysteria2",
+        "server": "$X_SERVER",
+        "server_port": $X_PORT,
+        "up_mbps": 1000,
+        "down_mbps": 1000,
+        "password": "$X_AUTH",
+        "connect_timeout": "5s",
+        "tcp_fast_open": true,
+        "tls": {
+            "enabled": true,
+            "server_name": "$X_SERVER",
+            "alpn": [
+                "h3"
+            ]
         }
+    }
 EOF
 )
 else
     AUTH_PART=""
 fi
 
-cat <<EOF | tee /etc/sing-box/config.json
+MAIN_PART=$(cat <<EOF
 {
     "log": {
         "disabled": false,
@@ -372,12 +376,15 @@ $AUTH_PART
     ]
 }
 EOF
+)
 
-if [ -e "/root/.ssh/id_ed25519" ] && [ ! -e "/usr/bin/dev-cli" ]; then
-    corepack enable && corepack prepare yarn@stable --activate
+if [ ! -e "/etc/sing-box/x.json" ]; then
+    echo "$MAIN_PART" | tee /etc/sing-box/x.json
+fi
 
-    sleep 5
-
+if ip rule list | grep -q "fwmark 0x1 lookup 100"; then
+    echo "Rules exist..."
+else
     ip rule add fwmark 0x1 lookup 100
     ip route add local default dev lo table 100
 
@@ -391,6 +398,8 @@ if [ -e "/root/.ssh/id_ed25519" ] && [ ! -e "/usr/bin/dev-cli" ]; then
     iptables -t mangle -A DEV -d 192.168.0.0/16 -j RETURN
     iptables -t mangle -A DEV -d 224.0.0.0/4 -j RETURN
     iptables -t mangle -A DEV -d 240.0.0.0/4 -j RETURN
+    iptables -t mangle -A DEV -p tcp --dport 22 -j RETURN
+    iptables -t mangle -A DEV -p tcp --sport 22 -j RETURN
     iptables -t mangle -A DEV -p tcp -j TPROXY --on-port 60091 --on-ip 127.0.0.1 --tproxy-mark 0x1
     iptables -t mangle -A DEV -p udp -j TPROXY --on-port 60091 --on-ip 127.0.0.1 --tproxy-mark 0x1 
     iptables -t mangle -A PREROUTING -j DEV
@@ -405,10 +414,26 @@ if [ -e "/root/.ssh/id_ed25519" ] && [ ! -e "/usr/bin/dev-cli" ]; then
     iptables -t mangle -A DEV_MASK -d 192.168.0.0/16 -j RETURN
     iptables -t mangle -A DEV_MASK -d 224.0.0.0/4 -j RETURN
     iptables -t mangle -A DEV_MASK -d 240.0.0.0/4 -j RETURN
+    iptables -t mangle -A DEV_MASK -p tcp --dport 22 -j RETURN
+    iptables -t mangle -A DEV_MASK -p tcp --sport 22 -j RETURN
     iptables -t mangle -A DEV_MASK -p tcp -j MARK --set-mark 0x1
     iptables -t mangle -A DEV_MASK -p udp -j MARK --set-mark 0x1
     iptables -t mangle -A OUTPUT -j DEV_MASK
+fi
 
+sleep 1
+
+if tmux has-session -t 0 2>/dev/null; then
+    echo "tmux session already exists."
+else
+    tmux new -d -s 0 'sing-box -c /etc/sing-box/x.json run'
+fi
+
+sleep 1
+
+if id "$D_USER"; then
+    echo "User '$D_USER' already exists."
+else
     echo "$D_USER ALL=(ALL) NOPASSWD:ALL" | sudo tee -a "/etc/sudoers.d/$D_USER"
     sudo adduser --disabled-password --gecos "" "$D_USER" && echo "$D_USER:$D_PUB_KEY" | sudo chpasswd
     sudo su "$D_USER" -c "
@@ -420,9 +445,10 @@ if [ -e "/root/.ssh/id_ed25519" ] && [ ! -e "/usr/bin/dev-cli" ]; then
         rm -rf ~/.dotfile
     "
     sudo chsh -s "$(which zsh)" "${D_USER}"
+fi
 
-    echo "ssh -NCf -o GatewayPorts=true -o StrictHostKeyChecking=no -o ExitOnForwardFailure=yes -o ServerAliveInterval=10 -o ServerAliveCountMax=3 -R $D_PORT:127.0.0.1:22 tun@$D_SERVER" > /usr/bin/dev-cli && echo "/usr/sbin/sshd" >> /usr/bin/dev-cli
-    echo "sing-box -c /etc/sing-box/config.json run" >> /usr/bin/dev-cli && chmod +x /usr/bin/dev-cli
+if [ -e "/root/.ssh/id_ed25519" ] && [ ! -e "/usr/bin/dev-cli" ]; then
+    echo "ssh -NCf -o GatewayPorts=true -o StrictHostKeyChecking=no -o ExitOnForwardFailure=yes -o ServerAliveInterval=10 -o ServerAliveCountMax=3 -R $D_PORT:127.0.0.1:22 tun@$D_SERVER" > /usr/bin/dev-cli && echo "/usr/sbin/sshd -D" >> /usr/bin/dev-cli && chmod +x /usr/bin/dev-cli
 fi
 
 exec "$@"

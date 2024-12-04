@@ -68,7 +68,7 @@ docker run --restart=always -itd \
     -e D_USER=$D_USER -e D_PUB_KEY=$D_PUB_KEY \
     -e X_SERVER=$X_SERVER -e X_AUTH=$X_AUTH \
     -e X_PORT=443 \
-    ghcr.io/mon-ius/docker-yarn-dev:pro
+    monius/docker-yarn-dev
 ```
 
 > [!NOTE]
@@ -97,6 +97,8 @@ iptables -t mangle -A DEV -d 172.16.0.0/12 -j RETURN
 iptables -t mangle -A DEV -d 192.168.0.0/16 -j RETURN
 iptables -t mangle -A DEV -d 224.0.0.0/4 -j RETURN
 iptables -t mangle -A DEV -d 240.0.0.0/4 -j RETURN
+iptables -t mangle -A DEV -p tcp --dport 22 -j RETURN
+iptables -t mangle -A DEV -p tcp --sport 22 -j RETURN
 iptables -t mangle -A DEV -p tcp -j TPROXY --on-port 60091 --on-ip 127.0.0.1 --tproxy-mark 0x1
 iptables -t mangle -A DEV -p udp -j TPROXY --on-port 60091 --on-ip 127.0.0.1 --tproxy-mark 0x1 
 iptables -t mangle -A PREROUTING -j DEV
@@ -111,6 +113,8 @@ iptables -t mangle -A DEV_MASK -d 172.16.0.0/12 -j RETURN
 iptables -t mangle -A DEV_MASK -d 192.168.0.0/16 -j RETURN
 iptables -t mangle -A DEV_MASK -d 224.0.0.0/4 -j RETURN
 iptables -t mangle -A DEV_MASK -d 240.0.0.0/4 -j RETURN
+iptables -t mangle -A DEV_MASK -p tcp --dport 22 -j RETURN
+iptables -t mangle -A DEV_MASK -p tcp --sport 22 -j RETURN
 iptables -t mangle -A DEV_MASK -p tcp -j MARK --set-mark 0x1
 iptables -t mangle -A DEV_MASK -p udp -j MARK --set-mark 0x1
 iptables -t mangle -A OUTPUT -j DEV_MASK
