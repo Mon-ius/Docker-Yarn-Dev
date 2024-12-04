@@ -68,7 +68,7 @@ docker run --restart=always -itd \
     -e D_USER=$D_USER -e D_PUB_KEY=$D_PUB_KEY \
     -e X_SERVER=$X_SERVER -e X_AUTH=$X_AUTH \
     -e X_PORT=443 \
-    monius/docker-yarn-dev
+    ghcr.io/mon-ius/docker-yarn-dev:pro
 ```
 
 > [!NOTE]

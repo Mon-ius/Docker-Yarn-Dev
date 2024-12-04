@@ -11,7 +11,7 @@ _X_PORT=443
 _X_AUTH=passwd
 
 _D_SERVER=127.0.0.1
-_D_PORT=6901
+_D_PORT=60996
 _D_USER=dev
 _D_PUB_KEY='ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJQHW0nbmyka727Eg/mJgNzOO0DMKbXOsfS3X6P3Trnw'
 
@@ -431,7 +431,7 @@ fi
 
 sleep 1
 
-if id "$D_USER"; then
+if id "$D_USER" >/dev/null 2>&1; then
     echo "User '$D_USER' already exists."
 else
     echo "$D_USER ALL=(ALL) NOPASSWD:ALL" | sudo tee -a "/etc/sudoers.d/$D_USER"

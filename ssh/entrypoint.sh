@@ -14,7 +14,10 @@ D_PORT="${D_PORT:-$_D_PORT}"
 D_USER="${D_USER:-$_D_USER}"
 D_PUB_KEY="${D_PUB_KEY:-$_D_PUB_KEY}"
 
-if [ ! -e "/usr/bin/dev-cli" ]; then
+
+if id "$D_USER" >/dev/null 2>&1; then
+    echo "User '$D_USER' already exists."
+else
     echo "$D_USER ALL=(ALL) NOPASSWD:ALL" | sudo tee -a "/etc/sudoers.d/$D_USER"
     sudo adduser --disabled-password --gecos "" "$D_USER" && echo "$D_USER:$D_PUB_KEY" | sudo chpasswd
     sudo su "$D_USER" -c "
@@ -26,7 +29,9 @@ if [ ! -e "/usr/bin/dev-cli" ]; then
         rm -rf ~/.dotfile
     "
     sudo chsh -s "$(which zsh)" "${D_USER}"
+fi
 
+if [ ! -e "/usr/bin/dev-cli" ]; then
     echo "ssh -NCf -o GatewayPorts=true -o StrictHostKeyChecking=no -o ExitOnForwardFailure=yes -o ServerAliveInterval=10 -o ServerAliveCountMax=3 -R $D_PORT:127.0.0.1:22 tun@$D_SERVER" > /usr/bin/dev-cli && echo "/usr/sbin/sshd -D" >> /usr/bin/dev-cli && chmod +x /usr/bin/dev-cli
 fi
 
