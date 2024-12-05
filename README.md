@@ -25,9 +25,8 @@ sudo usermod -aG docker $USER
 | **DockerHub** | **GHCR** |
 |---------------|---------------|
 | docker run --restart=always -itd \ <br> --name yarn_dev \ <br> --cap-add NET_ADMIN \ <br> -e X_SERVER=$X_SERVER -e X_AUTH=$X_AUTH \ <br> -e X_PORT=443 \ <br> monius/docker-yarn-dev | docker run --restart=always -itd \ <br> --name yarn_dev \ <br> --cap-add NET_ADMIN \ <br> -e X_SERVER=$X_SERVER -e X_AUTH=$X_AUTH \ <br> -e X_PORT=443 \ <br> ghcr.io/mon-ius/docker-yarn-dev |
-| **Atteach From Host** |
-| docker exec -it yarn_dev /bin/bash |
 
+`docker exec -it yarn_dev /bin/bash`
 
 ---
 
