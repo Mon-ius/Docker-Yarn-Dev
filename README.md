@@ -31,19 +31,6 @@ sudo usermod -aG docker $USER
 
 ```sh
 docker run --restart=always -itd \
-    --name yarn_dev \
-    --cap-add NET_ADMIN \
-    -e X_SERVER=$X_SERVER -e X_AUTH=$X_AUTH \
-    -e X_PORT=443 \
-    ghcr.io/mon-ius/docker-yarn-dev
-
-docker exec -it yarn_dev /bin/bash
-```
-
----
-
-```sh
-docker run --restart=always -itd \
     --name yarn_dev_ssh \
     -v ~/.ssh/id_ed25519:/root/.ssh/id_ed25519 \
     -e D_SERVER=$D_SERVER -e D_PORT=$D_PORT \
