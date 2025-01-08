@@ -15,7 +15,7 @@ X_PORT="${X_PORT:-$_X_PORT}"
 X_AUTH="${X_AUTH:-$_X_AUTH}"
 
 if [ -n "$X_SERVER" ] && [ -n "$X_PORT" ] && [ -n "$X_AUTH" ]; then
-AUTH_PART=$(cat <<EOF
+PROXY_PART=$(cat <<EOF
     {
         "tag": "Proxy",
         "type": "hysteria2",
@@ -37,14 +37,14 @@ AUTH_PART=$(cat <<EOF
 EOF
 )
 else
-    AUTH_PART=""
+    PROXY_PART=""
 fi
 
 MAIN_PART=$(cat <<EOF
 {
     "log": {
         "disabled": false,
-        "level": "info",
+        "level": "debug",
         "timestamp": true
     },
     "experimental": {
@@ -55,85 +55,69 @@ MAIN_PART=$(cat <<EOF
             "store_fakeip": true
         }
     },
+    "outbounds": [
+        {
+            "tag": "direct-out",
+            "type": "direct",
+            "udp_fragment": true
+        },
+        {
+            "type": "dns",
+            "tag": "dns-out"
+        },
+        {
+            "type": "block",
+            "tag": "block"
+        },
+$PROXY_PART
+    ],
     "dns": {
         "servers": [
             {
-                "tag": "google",
-                "address": "tls://8.8.8.8",
-                "detour": "Proxy"
+                "tag": "ND-h3",
+                "address": "h3://dns.nextdns.io/x",
+                "address_resolver": "dns-direct",
+                "detour": "direct-out"
             },
             {
-                "tag": "fallback",
-                "address": "8.8.8.8",
-                "address_resolver": "google",
-                "detour": "Proxy"
-            },
-            {
-                "tag": "local-dns",
-                "address": "223.5.5.5",
-                "detour": "direct"
-            },
-            {
-                "tag": "block-dns",
-                "address": "rcode://success"
+                "tag": "dns-direct",
+                "address": "udp://223.5.5.5",
+                "detour": "direct-out"
             }
         ],
+        "strategy": "ipv4_only",
+        "final": "ND-h3",
+        "reverse_mapping": true,
+        "disable_cache": false,
+        "disable_expire": false
+    },
+    "route": {
         "rules": [
             {
-                "outbound": "any",
-                "server": "local-dns"
+                "protocol": "dns",
+                "outbound": "dns-out"
             },
             {
-                "rule_set": [
-                    "Youtube0"
-                ],
-                "server": "fallback"
+                "ip_is_private": true,
+                "outbound": "direct-out"
             },
             {
-                "rule_set": [
-                    "Telegram1"
+                "ip_cidr": [
+                    "0.0.0.0/8",
+                    "10.0.0.0/8",
+                    "127.0.0.0/8",
+                    "169.254.0.0/16",
+                    "172.16.0.0/12",
+                    "192.168.0.0/16",
+                    "224.0.0.0/4",
+                    "240.0.0.0/4",
+                    "52.80.0.0/16"
                 ],
-                "server": "fallback"
-            },
-            {
-                "rule_set": [
-                    "Github0"
-                ],
-                "server": "fallback"
-            },
-            {
-                "rule_set": [
-                    "Openai0"
-                ],
-                "server": "fallback"
-            },
-            {
-                "rule_set": [
-                    "Netflix0"
-                ],
-                "server": "fallback"
-            },
-            {
-                "rule_set": [
-                    "Google0"
-                ],
-                "server": "fallback"
-            },
-            {
-                "rule_set": [
-                    "Direct1"
-                ],
-                "server": "local-dns"
-            },
-            {
-                "query_type": [
-                    "A"
-                ],
-                "rewrite_ttl": 1,
-                "server": "fallback"
+                "outbound": "direct-out"
             }
         ],
-        "strategy": "ipv4_only"
+        "auto_detect_interface": true,
+        "final": "Proxy"
     },
     "inbounds": [
         {
@@ -148,221 +132,6 @@ MAIN_PART=$(cat <<EOF
             "sniff_override_destination": false,
             "domain_strategy": "prefer_ipv4"
         }
-    ],
-    "route": {
-        "rule_set": [
-            {
-                "type": "remote",
-                "format": "binary",
-                "download_detour": "Proxy",
-                "tag": "Youtube0",
-                "url": "https://github.com/MetaCubeX/meta-rules-dat/raw/sing/geo/geosite/youtube.srs"
-            },
-            {
-                "type": "remote",
-                "format": "binary",
-                "download_detour": "Proxy",
-                "tag": "Telegram0",
-                "url": "https://github.com/MetaCubeX/meta-rules-dat/raw/sing/geo/geoip/telegram.srs"
-            },
-            {
-                "type": "remote",
-                "format": "binary",
-                "download_detour": "Proxy",
-                "tag": "Telegram1",
-                "url": "https://github.com/MetaCubeX/meta-rules-dat/raw/sing/geo/geosite/telegram.srs"
-            },
-            {
-                "type": "remote",
-                "format": "binary",
-                "download_detour": "Proxy",
-                "tag": "Github0",
-                "url": "https://github.com/MetaCubeX/meta-rules-dat/raw/sing/geo/geosite/github.srs"
-            },
-            {
-                "type": "remote",
-                "format": "binary",
-                "download_detour": "Proxy",
-                "tag": "Openai0",
-                "url": "https://github.com/MetaCubeX/meta-rules-dat/raw/sing/geo/geosite/openai.srs"
-            },
-            {
-                "type": "remote",
-                "format": "binary",
-                "download_detour": "Proxy",
-                "tag": "Netflix0",
-                "url": "https://github.com/MetaCubeX/meta-rules-dat/raw/sing/geo/geosite/netflix.srs"
-            },
-            {
-                "type": "remote",
-                "format": "binary",
-                "download_detour": "Proxy",
-                "tag": "Netflix1",
-                "url": "https://github.com/MetaCubeX/meta-rules-dat/raw/sing/geo-lite/geoip/netflix.srs"
-            },
-            {
-                "type": "remote",
-                "format": "binary",
-                "download_detour": "Proxy",
-                "tag": "Google0",
-                "url": "https://github.com/MetaCubeX/meta-rules-dat/raw/sing/geo/geosite/google.srs"
-            },
-            {
-                "type": "remote",
-                "format": "binary",
-                "download_detour": "Proxy",
-                "tag": "Direct0",
-                "url": "https://github.com/MetaCubeX/meta-rules-dat/raw/sing/geo/geoip/cn.srs"
-            },
-            {
-                "type": "remote",
-                "format": "binary",
-                "download_detour": "Proxy",
-                "tag": "Direct1",
-                "url": "https://github.com/MetaCubeX/meta-rules-dat/raw/sing/geo/geosite/cn.srs"
-            }
-        ],
-        "rules": [
-            {
-                "protocol": "dns",
-                "outbound": "dns-out"
-            },
-            {
-                "port": 53,
-                "outbound": "dns-out"
-            },
-            {
-                "type": "logical",
-                "mode": "or",
-                "rules": [
-                    {
-                        "port": 853
-                    },
-                    {
-                        "network": "udp",
-                        "port": 443
-                    },
-                    {
-                        "protocol": "stun"
-                    }
-                ],
-                "outbound": "block"
-            },
-            {
-                "rule_set": [
-                    "Youtube0"
-                ],
-                "outbound": "Youtube"
-            },
-            {
-                "rule_set": [
-                    "Telegram0",
-                    "Telegram1"
-                ],
-                "outbound": "Telegram"
-            },
-            {
-                "rule_set": [
-                    "Github0"
-                ],
-                "outbound": "Github"
-            },
-            {
-                "rule_set": [
-                    "Openai0"
-                ],
-                "outbound": "Openai"
-            },
-            {
-                "rule_set": [
-                    "Netflix0",
-                    "Netflix1"
-                ],
-                "outbound": "Netflix"
-            },
-            {
-                "rule_set": [
-                    "Google0"
-                ],
-                "outbound": "Google"
-            },
-            {
-                "rule_set": [
-                    "Direct0",
-                    "Direct1"
-                ],
-                "outbound": "direct"
-            },
-            {
-                "ip_is_private": true,
-                "outbound": "direct"
-            }
-        ],
-        "auto_detect_interface": true,
-        "final": "Proxy"
-    },
-    "outbounds": [
-        {
-            "tag": "Youtube",
-            "outbounds": [
-                "Proxy"
-            ],
-            "interrupt_exist_connections": true,
-            "type": "selector"
-        },
-        {
-            "tag": "Telegram",
-            "outbounds": [
-                "Proxy"
-            ],
-            "interrupt_exist_connections": true,
-            "type": "selector"
-        },
-        {
-            "tag": "Github",
-            "outbounds": [
-                "Proxy"
-            ],
-            "interrupt_exist_connections": true,
-            "type": "selector"
-        },
-        {
-            "tag": "Openai",
-            "outbounds": [
-                "Proxy"
-            ],
-            "interrupt_exist_connections": true,
-            "type": "selector"
-        },
-        {
-            "tag": "Netflix",
-            "outbounds": [
-                "Proxy"
-            ],
-            "interrupt_exist_connections": true,
-            "type": "selector"
-        },
-        {
-            "tag": "Google",
-            "outbounds": [
-                "Proxy"
-            ],
-            "interrupt_exist_connections": true,
-            "type": "selector"
-        },
-        {
-            "type": "direct",
-            "tag": "direct"
-        },
-        {
-            "type": "dns",
-            "tag": "dns-out"
-        },
-        {
-            "type": "block",
-            "tag": "block"
-        },
-$AUTH_PART
     ]
 }
 EOF
