@@ -21,11 +21,12 @@ PROXY_PART=$(cat <<EOF
         "type": "hysteria2",
         "server": "$X_SERVER",
         "server_port": $X_PORT,
-        "up_mbps": 1000,
-        "down_mbps": 1000,
+        "up_mbps": 100,
+        "down_mbps": 100,
         "password": "$X_AUTH",
         "connect_timeout": "5s",
         "tcp_fast_open": true,
+        "udp_fragment": true,
         "tls": {
             "enabled": true,
             "server_name": "$X_SERVER",
@@ -55,22 +56,6 @@ MAIN_PART=$(cat <<EOF
             "store_fakeip": true
         }
     },
-    "outbounds": [
-        {
-            "tag": "direct-out",
-            "type": "direct",
-            "udp_fragment": true
-        },
-        {
-            "type": "dns",
-            "tag": "dns-out"
-        },
-        {
-            "type": "block",
-            "tag": "block"
-        },
-$PROXY_PART
-    ],
     "dns": {
         "servers": [
             {
@@ -94,11 +79,24 @@ $PROXY_PART
     "route": {
         "rules": [
             {
+                "inbound": "tp-in",
+                "action": "sniff",
+                "sniffer": [
+                    "dns",
+                    "bittorrent",
+                    "http",
+                    "tls",
+                    "quic",
+                    "dtls"
+                ]
+            },
+            {
                 "protocol": "dns",
-                "outbound": "dns-out"
+                "action": "hijack-dns"
             },
             {
                 "ip_is_private": true,
+                "action": "route",
                 "outbound": "direct-out"
             },
             {
@@ -113,23 +111,31 @@ $PROXY_PART
                     "240.0.0.0/4",
                     "52.80.0.0/16"
                 ],
+                "action": "route",
                 "outbound": "direct-out"
             }
         ],
         "auto_detect_interface": true,
         "final": "Proxy"
     },
+    "outbounds": [
+$PROXY_PART,
+        {
+            "tag": "direct-out",
+            "type": "direct",
+            "udp_fragment": true
+        }
+    ],
     "inbounds": [
         {
             "type": "tproxy",
+            "tag": "tp-in",
             "listen": "::",
             "listen_port": 60091,
-            "sniff": true,
             "udp_fragment": true,
             "tcp_fast_open": true,
             "tcp_multi_path": false,
             "udp_timeout": "5m",
-            "sniff_override_destination": false,
             "domain_strategy": "prefer_ipv4"
         }
     ]
