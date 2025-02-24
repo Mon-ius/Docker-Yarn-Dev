@@ -54,59 +54,73 @@ fi
 MAIN_PART=$(cat <<EOF
 {
     "log": {
-        "disabled": false,
-        "level": "debug",
+        "level": "warn",
         "timestamp": true
     },
     "experimental": {
         "cache_file": {
             "enabled": true,
-            "path": "cache.db",
-            "cache_id": "v1",
-            "store_fakeip": true
+            "store_fakeip": true,
+            "store_rdrc": true
         }
     },
     "dns": {
         "servers": [
             {
-                "tag": "ND-h3",
-                "address": "h3://dns.nextdns.io/x",
+                "tag": "google",
+                "address": "https://dns.google/dns-query",
                 "address_resolver": "dns-direct",
-                "detour": "direct-out"
+                "client_subnet": "1.0.1.0",
+                "detour": "Proxy"
             },
             {
                 "tag": "dns-direct",
-                "address": "udp://223.5.5.5",
+                "address": "https://120.53.53.53/dns-query",
                 "detour": "direct-out"
             }
         ],
-        "strategy": "ipv4_only",
-        "final": "ND-h3",
+        "rules": [
+            {
+                "outbound": "any",
+                "server": "dns-direct",
+                "action": "route"
+            },
+            {
+                "rule_set": "geosite-geolocation-cn",
+                "server": "dns-direct",
+                "action": "route"
+            }
+        ],
+        "final": "google",
         "reverse_mapping": true,
         "disable_cache": false,
         "disable_expire": false
     },
     "route": {
+        "final": "Proxy",
+        "auto_detect_interface": true,
         "rules": [
             {
                 "inbound": "tp-in",
-                "action": "sniff",
-                "sniffer": [
-                    "dns",
-                    "bittorrent",
-                    "http",
-                    "tls",
-                    "quic",
-                    "dtls"
-                ]
+                "action": "sniff"
             },
             {
                 "protocol": "dns",
                 "action": "hijack-dns"
             },
             {
+                "rule_set": "geosite-geolocation-!cn",
+                "outbound": "Proxy"
+            },
+            {
+                "rule_set": [
+                    "geoip-cn",
+                    "geosite-geolocation-cn"
+                ],
+                "outbound": "direct-out"
+            },
+            {
                 "ip_is_private": true,
-                "action": "route",
                 "outbound": "direct-out"
             },
             {
@@ -121,12 +135,39 @@ MAIN_PART=$(cat <<EOF
                     "240.0.0.0/4",
                     "52.80.0.0/16"
                 ],
-                "action": "route",
                 "outbound": "direct-out"
             }
         ],
-        "auto_detect_interface": true,
-        "final": "Proxy"
+        "rule_set": [
+            {
+                "tag": "geosite-geolocation-cn",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://testingcf.jsdelivr.net/gh/lyc8503/sing-box-rules@rule-set-geosite/geosite-geolocation-cn.srs",
+                "download_detour": "direct-out"
+            },
+            {
+                "tag": "geosite-geolocation-!cn",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://testingcf.jsdelivr.net/gh/lyc8503/sing-box-rules@rule-set-geosite/geosite-geolocation-!cn.srs",
+                "download_detour": "direct-out"
+            },
+            {
+                "tag": "geosite-category-ads-all",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://testingcf.jsdelivr.net/gh/lyc8503/sing-box-rules@rule-set-geosite/geosite-category-ads-all.srs",
+                "download_detour": "direct-out"
+            },
+            {
+                "tag": "geoip-cn",
+                "type": "remote",
+                "format": "binary",
+                "url": "https://testingcf.jsdelivr.net/gh/lyc8503/sing-box-rules@rule-set-geoip/geoip-cn.srs",
+                "download_detour": "direct-out"
+            }
+        ]
     },
     "outbounds": [
 $PROXY_PART,
@@ -146,7 +187,6 @@ $PROXY_PART,
             "tcp_fast_open": true,
             "tcp_multi_path": false,
             "udp_timeout": "5m",
-            "domain_strategy": "prefer_ipv4"
         }
     ]
 }
