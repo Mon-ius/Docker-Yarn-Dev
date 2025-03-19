@@ -41,7 +41,6 @@ else
     PROXY_PART=""
 fi
 
-
 MAIN_PART=$(cat <<EOF
 {
     "log": {
@@ -51,48 +50,92 @@ MAIN_PART=$(cat <<EOF
     "experimental": {
         "cache_file": {
             "enabled": true,
-            "store_fakeip": true,
             "store_rdrc": true
         }
     },
     "dns": {
         "servers": [
             {
-                "tag": "google",
-                "address": "https://dns.google/dns-query",
-                "address_resolver": "dns-direct",
+                "tag": "remote",
+                "address": "https://1.0.0.1/dns-query",
+                "address_resolver": "local",
                 "client_subnet": "1.0.1.0",
                 "detour": "Proxy"
             },
             {
-                "tag": "dns-direct",
-                "address": "https://120.53.53.53/dns-query",
+                "tag": "local",
+                "address": "udp://119.29.29.29",
                 "detour": "direct-out"
             }
         ],
-        "rules": [
+"rules": [
             {
                 "outbound": "any",
-                "server": "dns-direct",
+                "server": "local",
                 "action": "route"
             },
             {
+                "action": "route-options",
+                "domain": [
+                    "*"
+                ],
+                "rewrite_ttl": 64,
+                "udp_connect": false,
+                "udp_disable_domain_unmapping": false
+            },
+            {
                 "rule_set": "geosite-geolocation-cn",
-                "server": "dns-direct",
+                "server": "local",
                 "action": "route"
+            },
+            {
+                "type": "logical",
+                "mode": "and",
+                "rules": [
+                    {
+                        "rule_set": "geosite-geolocation-!cn",
+                        "invert": true
+                    },
+                    {
+                        "rule_set": "geoip-cn"
+                    }
+                ],
+                "server": "remote",
+                "client_subnet": "114.114.114.114/24"
             }
         ],
-        "final": "google",
+        "strategy": "ipv4_only",
+        "final": "remote",
         "reverse_mapping": true,
         "disable_cache": false,
         "disable_expire": false
     },
+    "inbounds": [
+        {
+            "type": "tproxy",
+            "tag": "tp-in",
+            "listen": "::",
+            "listen_port": 60091,
+            "udp_fragment": true,
+            "tcp_fast_open": true,
+            "tcp_multi_path": false,
+            "udp_timeout": "5m",
+        }
+    ],
+    "outbounds": [
+$PROXY_PART,
+        {
+            "tag": "direct-out",
+            "type": "direct",
+            "udp_fragment": true
+        }
+    ],
     "route": {
         "final": "Proxy",
         "auto_detect_interface": true,
         "rules": [
             {
-                "inbound": "tp-in",
+                "inbound": "tun-in",
                 "action": "sniff"
             },
             {
@@ -100,8 +143,8 @@ MAIN_PART=$(cat <<EOF
                 "action": "hijack-dns"
             },
             {
-                "rule_set": "geosite-geolocation-!cn",
-                "outbound": "Proxy"
+                "protocol": ["quic", "BitTorrent"],
+                "action": "reject"
             },
             {
                 "rule_set": [
@@ -127,6 +170,10 @@ MAIN_PART=$(cat <<EOF
                     "52.80.0.0/16"
                 ],
                 "outbound": "direct-out"
+            },
+            {
+                "rule_set": "geosite-geolocation-!cn",
+                "outbound": "Proxy"
             }
         ],
         "rule_set": [
@@ -159,27 +206,7 @@ MAIN_PART=$(cat <<EOF
                 "download_detour": "direct-out"
             }
         ]
-    },
-    "outbounds": [
-$PROXY_PART,
-        {
-            "tag": "direct-out",
-            "type": "direct",
-            "udp_fragment": true
-        }
-    ],
-    "inbounds": [
-        {
-            "type": "tproxy",
-            "tag": "tp-in",
-            "listen": "::",
-            "listen_port": 60091,
-            "udp_fragment": true,
-            "tcp_fast_open": true,
-            "tcp_multi_path": false,
-            "udp_timeout": "5m",
-        }
-    ]
+    }
 }
 EOF
 )
