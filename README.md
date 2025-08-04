@@ -9,13 +9,19 @@
 
 Multi-platform: `linux/amd64`, `linux/arm64`, `linux/arm`, `linux/s390x` and `linux/riscv64`;
 
+---
+
 > [!IMPORTANT]  
 > For permission related issue to use `docker` instead of `sudo docker`
 
 ```sh
 sudo chmod 666 /var/run/docker.sock
+sudo chown root:docker /var/run/docker.sock
+
 sudo groupadd docker
-sudo usermod -aG docker $USER
+sudo usermod -aG docker ${USER}
+
+sudo systemctl enable docker && sudo systemctl start docker
 ```
 
 > [!TIP]
