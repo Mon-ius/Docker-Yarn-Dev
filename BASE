@@ -13,9 +13,4 @@ RUN apt-get -qq update \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/*
 
-RUN cat <<'EOF' | tee /etc/network/interfaces
-#!/bin/sh\nexit 0
-EOF
-
-RUN curl -fsSL bit.ly/create-sbox | sh
 RUN curl -fsSL bit.ly/create-nodejs | sh
