@@ -2,14 +2,12 @@ name: build-base
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 6 */6 * *'
   push:
     branches:
       - "master"
     paths:
       - ".github/workflows/build-base.yml"
-      - "deps/Dockerfile"
+      - "BASE"
 
 jobs:
   build-base:
