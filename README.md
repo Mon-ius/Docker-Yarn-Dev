@@ -107,9 +107,6 @@ iptables -t mangle -A DEV_MASK -p udp -j MARK --set-mark 0x1
 iptables -t mangle -A OUTPUT -j DEV_MASK
 ```
 
-> [!CAUTION]
-> - To prune all docker containers and images
-
-```sh
-docker rm -f $(docker ps -a -q) && docker rmi -f $(docker images -a -q)
-```
+### Source
+- [GitHub](https://github.com/Mon-ius/Docker-Yarn-Dev)
+- [DockerHub](https://hub.docker.com/r/monius/docker-yarn-dev)

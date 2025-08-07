@@ -35,4 +35,3 @@ RUN curl -fsSL "$NODE_23" | gpg --dearmor -o /etc/apt/trusted.gpg.d/node_23.gpg 
     && rm -rf /etc/apt/sources.list.d/node.list \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/*
-
