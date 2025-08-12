@@ -15,7 +15,7 @@ ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ="Europe/London"
 ENV PKG="openssh-server tmux vim zsh unzip g++ cmake"
-ENV LibTorch="https://download.pytorch.org/libtorch/nightly/cu124/libtorch-shared-with-deps-latest.zip"
+ENV LibTorch="https://download.pytorch.org/libtorch/nightly/cu129/libtorch-shared-with-deps-latest.zip"
 ENV NVIDIA="https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-archive-keyring.gpg"
 
 RUN apt-get -qq update \
