@@ -3,7 +3,7 @@ name: build-gpu
 on:
   workflow_dispatch:
   workflow_run:
-    workflows: ["build-deps"]
+    workflows: ["build-base"]
     types:
       - completed
   push:
