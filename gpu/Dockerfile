@@ -14,7 +14,7 @@ LABEL maintainer="M0nius <m0niusplus@gmail.com>" \
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=DontWarn
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ="Europe/London"
-ENV PKG="openssh-server tmux vim zsh unzip g++ cmake"
+ENV PKG="openssh-server tmux vim zsh unzip g++ cmake build-essential"
 ENV LibTorch="https://download.pytorch.org/libtorch/nightly/cu129/libtorch-shared-with-deps-latest.zip"
 ENV NVIDIA="https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-archive-keyring.gpg"
 
