@@ -20,14 +20,14 @@ ENV NVIDIA="https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/
 
 RUN apt-get -qq update \
     && apt-get -qq dist-upgrade -y \
-    && apt-get -qq install "$PKG" \
+    && apt-get -qq install $PKG \
     && apt-get -qq autoremove --purge \
     && apt-get -qq autoclean \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/*
 
 RUN Torch=/opt/torch && \ 
-    curl -fsSL -C - "$LibTorch" -o libtorch.zip && \
+    curl -fsSL -C - $LibTorch -o libtorch.zip && \
     unzip libtorch.zip -d $Torch && \
     rm libtorch.zip
 

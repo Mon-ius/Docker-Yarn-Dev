@@ -18,7 +18,7 @@ ENV PKG="openssh-server tmux vim zsh"
 
 RUN apt-get -qq update \
     && apt-get -qq dist-upgrade -y \
-    && apt-get -qq install "$PKG" \
+    && apt-get -qq install $PKG \
     && apt-get -qq autoremove --purge \
     && apt-get -qq autoclean \
     && rm -rf /var/lib/apt/lists/* \
