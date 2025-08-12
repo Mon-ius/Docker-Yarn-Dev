@@ -33,7 +33,7 @@ RUN Torch=/opt/torch && \
 
 RUN curl -fsSL "$NVIDIA" | tee /etc/apt/trusted.gpg.d/cuda-archive-keyring.gpg && \
     echo "deb https://developer.download.nvidia.com/compute/cuda/repos/debian12/x86_64/ /" | tee /etc/apt/sources.list.d/cuda.list && \
-    apt-get update && apt-get install -y cuda-toolkit
+    apt-get update && apt-get install -y cuda-toolkit-13-0
 
 COPY entrypoint.sh /run/entrypoint.sh
 ENTRYPOINT ["/run/entrypoint.sh"]
