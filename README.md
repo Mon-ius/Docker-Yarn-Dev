@@ -11,6 +11,19 @@ Multi-platform: `linux/arm`, `linux/arm64`, `linux/amd64`,  `linux/ppc64le`, `li
 
 ---
 
+```sh
+docker run --restart=always -itd \
+    --name xdev_gpu \
+    --cap-add NET_ADMIN \
+    --shm-size=16G \
+    --device /dev/nvidia3 \
+    --device /dev/nvidiactl \
+    --device /dev/nvidia-modeset \
+    --device /dev/nvidia-uvm \
+    ghcr.io/mon-ius/docker-yarn-dev:gpu
+```
+
+
 > [!IMPORTANT]  
 > For permission related issue to use `docker` instead of `sudo docker`
 
